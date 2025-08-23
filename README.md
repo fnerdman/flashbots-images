@@ -43,13 +43,13 @@ For more information about this repository, see [the Flashbots collective post](
 **Using Make (Recommended)**:
 ```bash
 # Build the BOB (searcher sandbox) image
-make build MODULE=bob
+make build IMAGE=bob
 
 # Build the Buildernet image  
-make build MODULE=buildernet
+make build IMAGE=buildernet
 
 # Build with development tools
-make build-dev MODULE=bob
+make build-dev IMAGE=bob
 
 # View all available targets
 make help
