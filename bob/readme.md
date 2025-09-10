@@ -142,7 +142,7 @@ Once searchers receive the IP for their TDX Machine deployed by Flashbots, they 
 Searchers will need to build the image locally in order to produce the measurement in step 3, which will take around 30 minutes depending on hardware. Searchers will need Nix and a few other [prerequisites](https://github.com/flashbots/flashbots-images/tree/main?tab=readme-ov-file#prerequisites). 
 
 ```bash
-# clone repo
+umask 0022
 git clone https://github.com/flashbots/flashbots-images.git
 cd flashbots-images
 
@@ -355,16 +355,6 @@ To submit bundles, connect to the server:
 https://backruns.tee-searcher.flashbots.net
 ```
 
-
-Please run the following command to **cache DNS resolution** (remember: DNS is not available during production mode!)
-
-```bash
-echo "3.149.14.12 tx.tee-searcher.flashbots.net" >> /etc/hosts
-echo "3.136.107.142 tx.tee-searcher.flashbots.net" >> /etc/hosts
-echo "18.221.59.61 backruns.tee-searcher.flashbots.net" >> /etc/hosts
-echo "3.15.88.156 backruns.tee-searcher.flashbots.net" >> /etc/hosts
-```
-
 ### Searching on Titan Builder's Bottom of Block
 
 **<u>Subscribing to Titan's State Diff Stream</u>**
@@ -497,12 +487,6 @@ Use the `eth_sendBobBundle` method to submit bundles:
 Note on `targetPools`:
 - Titan Builder will use `targetPools` to determine what other blocks to consider adding the bottom of block bundle to.
 - Searchers should include the address of the contract that’s state change causes the arbitrage. For example, the Uni V2 pool address.
-
-Please run the following command to **cache DNS resolution** (remember: DNS is not available during production mode!)
-
-```bash
-echo "52.207.17.217 fbtee.titanbuilder.xyz" >> /etc/hosts
-```
 
 Disk Persistence
 ------------------------
