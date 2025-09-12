@@ -35,7 +35,7 @@ LIGHTHOUSE_BUILD_CMD="
     export CARGO_TERM_COLOR='never'
 
     cargo fetch
-    cargo build --release --frozen --bin lighthouse --no-default-features --features portable
+    DESTDIR=$BUILDROOT cargo build --release --frozen --bin lighthouse --no-default-features --features portable
 "
 make_git_package \
     "lighthouse" \
