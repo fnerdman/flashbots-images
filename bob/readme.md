@@ -226,38 +226,39 @@ go build
 ```
 
 <details>
-<summary>Example Output</summary>
+<summary>Expected Output</summary>
     
     ```
-    ubuntu@schmangelina-bob-mkosi-builder:~/searcher/flashbots-images/measured-boot$ ./measured-boot /home/ubuntu/searcher/flashbots-images/build/tdx-debian-azure.efi output.json --direct-uki
-    EFI Boot Stages:
-      Stage 1 - Unified Kernel Image (UKI): 3acf0271e5a4b7e6b494262be3500b5ca19318dbdd75150ae3015667170af494
-      Stage 2 - Linux                     : 70f79e8d43867dd04073fd8f5120f3791c2086d77b07400b1a344a5608aacae3
-    Linux LOAD_FILE2 protocol:
-      cmdline: "console=tty0 console=ttyS0,115200n8 mitigations=auto,nosmt spec_store_bypass_disable=on nospectre_v2\x00"
-      initrd (digest 0edff2c3a087c43870ad27772d7177ddb79b091aef39c1f3f5987ad504caa947)
-    UKI sections:
-      Section  1 - .linux   (   5882880 bytes):     0da293e37ad5511c59be47993769aacb91b243f7d010288e118dc90e95aaef5a, 6ebf6717232ab65a16cf25f7e30ad5f713bd4659b87f56992e230a1268d829a2
-      Section  2 - .osrel   (       314 bytes):     3fb9e4e3cc810d4326b5c13cef18aee1f9df8c5f4f7f5b96665724fa3b846e08, 06576b344b1404b9ffe4232004a75541451324ce88c6c7c677b7b90539cab1aa
-      Section  3 - .cmdline (       101 bytes):     461203a89f23e36c3a4dc817f905b00484d2cf7e7d9376f13df91c41d84abe46, 5b20d03fb990ccafdcfa1ddb37feff37141e728776ed89f335798f3c3899a135
-      Section  4 - .initrd  ( 151953230 bytes):     15ee37e75f1e8d42080e91fdbbd2560780918c81fe3687ae6d15c472bbdaac75, 0edff2c3a087c43870ad27772d7177ddb79b091aef39c1f3f5987ad504caa947
-      Section  5 - .uname   (         6 bytes):     da7a6d941caa9d28b8a3665c4865c143db8f99400ac88d883370ae3021636c30, f224253965066b7d33e0b5d6c0931805ab9f9fb092470911cd20625786b2d048
-      Section  6 - .sbat    (       309 bytes):     ff552fd255be18a3d61c0da88976fc71559d13aad12d1dfe1708cf950cc4b74c, eae67f3a8f5614d71bd75143feeecbb3c12cd202192e2830f0fb1c6df0f4a139
-      Section  7 - .data   :        not measured
-      Section  8 - .reloc  :        not measured
-      Section  9 - .rodata :        not measured
-      Section 10 - .sdmagic:        not measured
-      Section 11 - .text   :        not measured
-    PCR[ 4]: c98b97d2dcf06e785ec88f351c59ebf343c3029782e62a08b37997701ccec89f
-    PCR[ 9]: 5216924dcdd97d09095369dfec8d02bdd0c165a949025f486238a82d69d07fc9
-    PCR[11]: 41e5cf002f9645b4fd5fc372123fd3041d4e4b618c5f99ac4d24b5986a52359a
-    PCR[12]: 0000000000000000000000000000000000000000000000000000000000000000
-    PCR[13]: 0000000000000000000000000000000000000000000000000000000000000000
-    PCR[15]: 0000000000000000000000000000000000000000000000000000000000000000
+    ubuntu@schmangelina-bob-mkosi-builder:~/measured-boot$ ./measured-boot /home/ubuntu/flashbots-images/build/tdx-debian.efi output.json --direct-uki
+EFI Boot Stages:
+  Stage 1 - Unified Kernel Image (UKI): 5a7b84c0d822f94e08ef75d6ef7d0e116da3abf644ed85f9f436f5cdf4acdae8
+  Stage 2 - Linux                     : eb1a69b12b47b6b3d4716bad94323d27173cba5f4285b918a2bf59ea5cb3c9ea
+Linux LOAD_FILE2 protocol:
+  cmdline: "console=tty0 console=ttyS0,115200n8 mitigations=auto,nosmt spec_store_bypass_disable=on nospectre_v2\x00"
+  initrd (digest 68bfa83be46397bbbbd92e84a196f3a860b9891aed59aa8746a117e8c6bf7e41)
+UKI sections:
+  Section  1 - .linux   (   5829632 bytes):     0da293e37ad5511c59be47993769aacb91b243f7d010288e118dc90e95aaef5a, 7439b377dbba898b0db23928be49fb906aa5551cfc01395bc37b8bd50d8f5530
+  Section  2 - .osrel   (       308 bytes):     3fb9e4e3cc810d4326b5c13cef18aee1f9df8c5f4f7f5b96665724fa3b846e08, 94e5e922dec19c3ab3e3c85b5d30dbb563098a430418a70c11a5b729721fae39
+  Section  3 - .cmdline (       101 bytes):     461203a89f23e36c3a4dc817f905b00484d2cf7e7d9376f13df91c41d84abe46, 5b20d03fb990ccafdcfa1ddb37feff37141e728776ed89f335798f3c3899a135
+  Section  4 - .initrd  ( 163088224 bytes):     15ee37e75f1e8d42080e91fdbbd2560780918c81fe3687ae6d15c472bbdaac75, 68bfa83be46397bbbbd92e84a196f3a860b9891aed59aa8746a117e8c6bf7e41
+  Section  5 - .uname   (         7 bytes):     da7a6d941caa9d28b8a3665c4865c143db8f99400ac88d883370ae3021636c30, 2200d673ad92228af377b9573ed86e7a4e36a87a2a9a08d8c1134aca3ddb021c
+  Section  6 - .sbat    (       309 bytes):     ff552fd255be18a3d61c0da88976fc71559d13aad12d1dfe1708cf950cc4b74c, eae67f3a8f5614d71bd75143feeecbb3c12cd202192e2830f0fb1c6df0f4a139
+  Section  7 - .data   :        not measured
+  Section  8 - .reloc  :        not measured
+  Section  9 - .rodata :        not measured
+  Section 10 - .sdmagic:        not measured
+  Section 11 - .text   :        not measured
+PCR[ 4]: 4d31b587563c01e8ea4ce1996c255892983ecd411b9d0646475b025911071b65
+PCR[ 9]: 04e7bfed6725d1d9773068f9efa664028be58aaddf3623286217379d20b8eede
+PCR[11]: 07960442cfc35ae20e01719ccec17f6c6a7e427a614c846c0dcd3967b998a2ff
+PCR[12]: 0000000000000000000000000000000000000000000000000000000000000000
+PCR[13]: 0000000000000000000000000000000000000000000000000000000000000000
+PCR[15]: 0000000000000000000000000000000000000000000000000000000000000000
     ```
 </details>
 
 Then, copy and paste PCR 4, 9, and 11 into the following format and save as `measurements.json`
+The image built locally, and as measured by Azure, should match the following hashes. 
 ```bash
 [
   {
@@ -265,13 +266,13 @@ Then, copy and paste PCR 4, 9, and 11 into the following format and save as `mea
       "attestation_type": "azure-tdx",
       "measurements": {
           "4": {
-              "expected": "c98b97d2dcf06e785ec88f351c59ebf343c3029782e62a08b37997701ccec89f"
+              "expected": "4d31b587563c01e8ea4ce1996c255892983ecd411b9d0646475b025911071b65"
           },
           "9": {
-              "expected": "5216924dcdd97d09095369dfec8d02bdd0c165a949025f486238a82d69d07fc9"
+              "expected": "04e7bfed6725d1d9773068f9efa664028be58aaddf3623286217379d20b8eede"
           },
           "11": {
-              "expected": "41e5cf002f9645b4fd5fc372123fd3041d4e4b618c5f99ac4d24b5986a52359a"
+              "expected": "07960442cfc35ae20e01719ccec17f6c6a7e427a614c846c0dcd3967b998a2ff"
           }
       }
   }
