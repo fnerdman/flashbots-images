@@ -37,7 +37,7 @@ su -s /bin/sh searcher -c "cd ~ && podman run -d \
         cp /etc/ssh/ssh_host_ed25519_key.pub /etc/searcher/ssh_hostkey/host_key.pub && \
         echo \"0 * * * * root /usr/sbin/logrotate /etc/logrotate.d/searcher.conf\" > /etc/cron.d/searcher-logrotate && \
         service cron start && \
-        /usr/sbin/sshd -D -e'"
+        while true; do /usr/sbin/sshd -D -e; sleep 5; done'"
 
 # Attempt a quick check that the container is running
 for i in 1 2 3 4 5; do
