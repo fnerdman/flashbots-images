@@ -25,6 +25,13 @@ jobs:
       run: |
         sudo sysctl -w kernel.unprivileged_userns_clone=1
         sudo sysctl -w user.max_user_namespaces=15000
+        sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+    - name: Verify unshare functionality
+      run: |
+        echo "Testing unshare with setgroups..."
+        unshare --user --map-root-user /bin/true
+        echo "✓ unshare test passed - user namespaces are working correctly"
 
     - name: Install Nix
       uses: cachix/install-nix-action@v27
