@@ -10,6 +10,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    permissions:
+      id-token: write      # Required for OIDC token generation
+      contents: read       # Read repository contents
+      attestations: write  # Create attestation artifacts
+      packages: write      # Push to GitHub Container Registry
 
     steps:
     - name: Checkout repository
