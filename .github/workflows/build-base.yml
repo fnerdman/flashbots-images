@@ -32,12 +32,6 @@ jobs:
         sudo sysctl -w user.max_user_namespaces=15000
         sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-    - name: Verify unshare functionality
-      run: |
-        echo "Testing unshare with setgroups..."
-        unshare --user --map-root-user /bin/true
-        echo "✓ unshare test passed - user namespaces are working correctly"
-
     - name: Setup ORAS
       uses: oras-project/setup-oras@v1
       with:
@@ -50,52 +44,12 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Test ORAS + Attestation Flow
-      run: |
-        # Create a small test file
-        echo "Test artifact created at $(date -u)" > test-artifact.txt
-        echo "Repository: ${{ github.repository }}" >> test-artifact.txt
-        echo "Commit: ${{ github.sha }}" >> test-artifact.txt
-        echo "Ref: ${{ github.ref }}" >> test-artifact.txt
-
-        # Push test artifact with ORAS
-        REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-        oras push ghcr.io/$REPO_LOWER/test-artifacts:${{ github.sha }} \
-          test-artifact.txt:text/plain
-
-        # Get the digest for attestation
-        DIGEST=$(oras resolve ghcr.io/$REPO_LOWER/test-artifacts:${{ github.sha }})
-        echo "ARTIFACT_DIGEST=$DIGEST" >> $GITHUB_ENV
-        echo "ARTIFACT_NAME=ghcr.io/$REPO_LOWER/test-artifacts" >> $GITHUB_ENV
-        echo "📦 Pushed test artifact with digest: $DIGEST"
-
-    - name: Generate test attestation
-      uses: actions/attest-build-provenance@v1
+    - name: Install Nix
+      uses: cachix/install-nix-action@v27
       with:
-        subject-name: ${{ env.ARTIFACT_NAME }}
-        subject-digest: ${{ env.ARTIFACT_DIGEST }}
-        push-to-registry: true
-
-    - name: Verify attestation works
-      run: |
-        echo "🔍 Verifying attestation for test artifact..."
-        gh attestation verify oci://${{ env.ARTIFACT_NAME }}@${{ env.ARTIFACT_DIGEST }} \
-          --owner ${{ github.repository_owner }}
-        echo "✅ Attestation verification successful!"
-
-    - name: Skip build for testing
-      run: |
-        echo "🚧 Skipping actual build steps for ORAS/attestation testing"
-        echo "Remove this step and uncomment the build steps below when ready"
-        exit 0
-
-    # COMMENTED OUT FOR TESTING - UNCOMMENT WHEN ORAS FLOW WORKS
-    # - name: Install Nix
-    #   uses: cachix/install-nix-action@v27
-    #   with:
-    #     nix_path: nixpkgs=channel:nixos-unstable
-    #     extra_nix_config: |
-    #       experimental-features = nix-command flakes
+        nix_path: nixpkgs=channel:nixos-unstable
+        extra_nix_config: |
+          experimental-features = nix-command flakes
 
     - name: Cache mkosi artifacts
       uses: actions/cache@v4
@@ -123,14 +77,30 @@ jobs:
         echo "SHA256 checksums:" >> build-info.txt
         sha256sum build/tdx-debian.efi >> build-info.txt
 
-    - name: Upload base image
-      uses: actions/upload-artifact@v4
+    - name: Push VM image to registry with ORAS
+      run: |
+        REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+
+        # Push the VM image bundle with ORAS
+        oras push ghcr.io/$REPO_LOWER/vm-images:${{ github.sha }} \
+          build/tdx-debian.efi:application/vnd.efi \
+          build/tdx-debian.manifest:application/json \
+          build-info.txt:text/plain
+
+        # Also tag as latest on main branch
+        if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+          oras tag ghcr.io/$REPO_LOWER/vm-images:${{ github.sha }} latest
+        fi
+
+        # Get the digest for attestation
+        DIGEST=$(oras resolve ghcr.io/$REPO_LOWER/vm-images:${{ github.sha }})
+        echo "VM_IMAGE_DIGEST=$DIGEST" >> $GITHUB_ENV
+        echo "VM_IMAGE_NAME=ghcr.io/$REPO_LOWER/vm-images" >> $GITHUB_ENV
+        echo "📦 Pushed VM image with digest: $DIGEST"
+
+    - name: Generate attestation for VM image
+      uses: actions/attest-build-provenance@v1
       with:
-        name: base-image-${{ github.sha }}
-        path: |
-          build/tdx-debian.efi
-          build/tdx-debian.manifest
-          build-info.txt
-        retention-days: 30
-        if-no-files-found: error
-        compression-level: 9
+        subject-name: ${{ env.VM_IMAGE_NAME }}
+        subject-digest: ${{ env.VM_IMAGE_DIGEST }}
+        push-to-registry: true
