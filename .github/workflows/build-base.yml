@@ -58,13 +58,13 @@ jobs:
 
     - name: Generate build info
       run: |
-        echo "Build completed at: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" > build/build-info.txt
-        echo "Git commit: ${{ github.sha }}" >> build/build-info.txt
-        echo "Git ref: ${{ github.ref }}" >> build/build-info.txt
-        echo "Runner OS: ${{ runner.os }}" >> build/build-info.txt
-        echo "" >> build/build-info.txt
-        echo "SHA256 checksums:" >> build/build-info.txt
-        sha256sum build/tdx-debian.efi >> build/build-info.txt
+        echo "Build completed at: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" > build-info.txt
+        echo "Git commit: ${{ github.sha }}" >> build-info.txt
+        echo "Git ref: ${{ github.ref }}" >> build-info.txt
+        echo "Runner OS: ${{ runner.os }}" >> build-info.txt
+        echo "" >> build-info.txt
+        echo "SHA256 checksums:" >> build-info.txt
+        sha256sum build/tdx-debian.efi >> build-info.txt
 
     - name: Upload base image
       uses: actions/upload-artifact@v4
@@ -73,7 +73,7 @@ jobs:
         path: |
           build/tdx-debian.efi
           build/tdx-debian.manifest
-          build/build-info.txt
+          build-info.txt
         retention-days: 30
         if-no-files-found: error
         compression-level: 9
