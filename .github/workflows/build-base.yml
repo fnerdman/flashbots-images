@@ -20,9 +20,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Check systemd version
-      run: systemctl --version
-
     - name: Install debian-archive-keyring
       run: sudo apt-get update && sudo apt-get install -y debian-archive-keyring
 
@@ -51,49 +48,26 @@ jobs:
         extra_nix_config: |
           experimental-features = nix-command flakes
 
-    - name: Cache mkosi artifacts
-      uses: actions/cache@v4
-      with:
-        path: |
-          mkosi.cache
-          mkosi.packages
-        key: mkosi-cache-${{ runner.os }}-${{ hashFiles('base/base.conf', 'flake.lock') }}
-        restore-keys: |
-          mkosi-cache-${{ runner.os }}-
-
     - name: Build base image
       run: nix develop -c mkosi --force -I base/base.conf
 
     - name: List build artifacts
       run: ls -lh build/
 
-    - name: Generate build info
-      run: |
-        echo "Build completed at: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" > build-info.txt
-        echo "Git commit: ${{ github.sha }}" >> build-info.txt
-        echo "Git ref: ${{ github.ref }}" >> build-info.txt
-        echo "Runner OS: ${{ runner.os }}" >> build-info.txt
-        echo "" >> build-info.txt
-        echo "SHA256 checksums:" >> build-info.txt
-        sha256sum build/tdx-debian.efi >> build-info.txt
-
     - name: Push VM image to registry with ORAS
       run: |
         REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
 
-        # Push the VM image bundle with ORAS
-        oras push ghcr.io/$REPO_LOWER/vm-images:${{ github.sha }} \
+        # Push the VM image bundle with ORAS and capture digest immediately
+        DIGEST=$(oras push ghcr.io/$REPO_LOWER/vm-images:${{ github.sha }} \
           build/tdx-debian.efi:application/vnd.efi \
           build/tdx-debian.manifest:application/json \
-          build-info.txt:text/plain
+          --format go-template="{{.digest}}")
 
         # Also tag as latest on main branch
         if [ "${{ github.ref }}" = "refs/heads/main" ]; then
           oras tag ghcr.io/$REPO_LOWER/vm-images:${{ github.sha }} latest
         fi
-
-        # Get the digest for attestation
-        DIGEST=$(oras resolve ghcr.io/$REPO_LOWER/vm-images:${{ github.sha }})
         echo "VM_IMAGE_DIGEST=$DIGEST" >> $GITHUB_ENV
         echo "VM_IMAGE_NAME=ghcr.io/$REPO_LOWER/vm-images" >> $GITHUB_ENV
         echo "📦 Pushed VM image with digest: $DIGEST"
